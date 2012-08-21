@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <!-- Paypal sandbox config
+        <parameter key="astina_payment.paypal.api_username">sdk-three_api1.sdk.com</parameter>
+        <parameter key="astina_payment.paypal.api_password">QFZCWN5HZM8VBG7Q</parameter>
+        <parameter key="astina_payment.paypal.api_signature">A.d9eRKfd1yVkRrtmMfCFLTqa6M9AyodL0SJkhYztxUi8W9pCXF6.4NI</parameter>
+        <parameter key="astina_payment.paypal.api_endpoint">https://api-3t.sandbox.paypal.com/nvp</parameter>
+        <parameter key="astina_payment.paypal.paypal_url">https://www.sandbox.paypal.com/webscr&amp;cmd=_express-checkout&amp;token=</parameter>
+        -->
+        <parameter key="astina_payment.paypal.api_endpoint">https://api-3t.paypal.com/nvp</parameter>
+        <parameter key="astina_payment.paypal.paypal_url">https://www.paypal.com/webscr&amp;cmd=_express-checkout&amp;token=</parameter>
+        <parameter key="astina_payment.paypal.subject"><!-- merchant email address --></parameter>
+        <parameter key="astina_payment.paypal.version">53.0</parameter>
+    </parameters>
+
+    <!--
+    <services>
+        <service id="astina_payment.example" class="%astina_payment.example.class%">
+            <argument type="service" id="service_id" />
+            <argument>plain_value</argument>
+            <argument>%parameter_name%</argument>
+        </service>
+    </services>
+    -->
+</container>
