@@ -40,3 +40,19 @@ Service configuration:
         <argument>%astina_payment.paypal.version%</argument> <!-- optional, defaults to 53.0 -->
     </service>
 
+Saferpay Provider
+------------------
+
+The Saferpay provider is using the HTTPS API (V4.1.6).
+
+Documenation: https://astina.atlassian.net/wiki/download/attachments/3932162/Saferpay+Payment+Page+V4.1.6+EN.pdf
+
+Service Configuration:
+
+    <service id="astina_payment.provider" class="Astina\PaymentBundle\Provider\Saferpay\Provider">
+        <argument>%astina_payment.saferpay.endpoint%</argument>
+        <argument>%astina_payment.saferpay.accountId%</argument>
+        <argument>%astina_payment.saferpay.vtconfig%</argument> <!-- optional -->
+        <argument type="service" id="logger" />
+    </service>
+
