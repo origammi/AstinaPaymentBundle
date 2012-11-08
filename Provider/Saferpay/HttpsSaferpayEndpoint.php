@@ -11,6 +11,9 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
     /** @var string $accountId */
     private $accountId;
 
+    /** @var string $password */
+    private $password;
+
     /** @var string $vtConfig */
     private $vtConfig;
 
@@ -18,10 +21,12 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
 
     public function __construct($logger,
                                 $accountId,
+                                $password = null,
                                 $vtConfig = null)
     {
         $this->logger = $logger;
         $this->accountId = $accountId;
+        $this->password = $password;
         $this->vtConfig = $vtConfig;
     }
 
@@ -55,7 +60,11 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
         $payCompleteParams['ACCOUNTID'] = $this->accountId;
         $payCompleteParams['ID'] = $transactionId;
 
-        return $this->apiCall('PayComplete.asp', $payCompleteParams);
+        if($this->password) {
+            $payCompleteParams['spPassword'] = $this->password;
+        }
+
+        return $this->apiCall('PayCompleteV2.asp', $payCompleteParams);
     }
 
     public function generatePaymentInitParams(TransactionInterface $transaction,
@@ -75,6 +84,10 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
         $paymentInitParams['SUCCESSLINK'] = $successUrl;
         $paymentInitParams['FAILLINK'] = $errorUrl;
         $paymentInitParams['BACKLINK'] = $cancelUrl;
+
+        foreach($params as $key => $value) {
+            $paymentInitParams[$key] = $value;
+        }
 
         return $paymentInitParams;
     }

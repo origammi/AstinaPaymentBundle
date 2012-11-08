@@ -3,6 +3,7 @@
 namespace Astina\Bundle\PaymentBundle\Provider\Saferpay;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Translation\Translator;
 
 use Astina\Bundle\PaymentBundle\Provider\ProviderInterface;
 use Astina\Bundle\PaymentBundle\Provider\OrderInterface;
@@ -15,12 +16,18 @@ use Astina\Bundle\PaymentBundle\Provider\Saferpay\SaferpayEndpoint;
  */
 class Provider implements ProviderInterface
 {
+    const PAYMENT_METHOD = 'Saferpay';
+
     /** @var SaferpayEndpoint $endpoint*/
     private $endpoint;
 
-    public function __construct(SaferpayEndpoint $endpoint)
+    private $translator;
+
+    public function __construct(SaferpayEndpoint $endpoint,
+                                Translator $translator)
     {
         $this->endpoint = $endpoint;
+        $this->translator = $translator;
     }
 
     /**
@@ -33,6 +40,9 @@ class Provider implements ProviderInterface
         $transaction->setAmount($order->getTotalPrice());
         $transaction->setCurrency($order->getCurrency());
 
+        // description is mandatory for Saferpay
+        $transaction->setReference($this->translator->trans('payment.saferpay.description'));
+
         return $transaction;
     }
 
@@ -43,13 +53,13 @@ class Provider implements ProviderInterface
     {
         if($transaction->getResponseMessage() == null ||
            $transaction->getTransactionToken() == null) {
-            throw new \Exception('Unable to authorize transaction without DATA or SIGNATURE');
+            throw new \Exception('Unable to authorize transaction without DATA or SIGNATURE: ' . $verificationMessage);
         }
 
         $verificationMessage = $this->endpoint->verifyPayConfirm($transaction->getResponseMessage(), $transaction->getTransactionToken());
 
         if(substr($verificationMessage, 0, 2) != 'OK') {
-            throw new \Exception('Unable to verify transaction');
+            throw new \Exception('Unable to verify transaction: ' . $verificationMessage);
         }
 
         preg_match('/ID=([^&]+)/', $verificationMessage, $matches);
@@ -62,7 +72,12 @@ class Provider implements ProviderInterface
      */
     function captureTransaction(TransactionInterface $transaction)
     {
-        $transaction->setStatus($this->endpoint->createPayComplete($transaction->getTransactionId()));
+        $captureMessage = $this->endpoint->createPayComplete($transaction->getTransactionId());
+        if(substr($captureMessage, 0, 2) != 'OK') {
+            throw new \Exception('Unable to verify transaction: ' . $captureMessage);
+        }
+        $transaction->setStatus($captureMessage);
+        $transaction->setPaymentMethod(self::PAYMENT_METHOD);
     }
 
     /**
