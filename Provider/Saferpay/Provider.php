@@ -3,6 +3,7 @@
 namespace Astina\Bundle\PaymentBundle\Provider\Saferpay;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
 
 use Astina\Bundle\PaymentBundle\Provider\ProviderInterface;
@@ -23,8 +24,12 @@ class Provider implements ProviderInterface
 
     private $translator;
 
+    /** @var $logger \Symfony\Component\HttpKernel\Log\LoggerInterface */
+    private $logger;
+
     public function __construct(SaferpayEndpoint $endpoint,
-                                Translator $translator)
+                                Translator $translator,
+                                LoggerInterface $logger)
     {
         $this->endpoint = $endpoint;
         $this->translator = $translator;
