@@ -46,7 +46,12 @@ abstract class AbstractTransaction implements TransactionInterface
 	 * @ORM\Column(type="string", length=50)
 	 */
 	private $paymentMethod;
-	
+
+    /**
+	 * @ORM\Column(type="string", length=50)
+	 */
+	private $providerName;
+
 	private $cardNumber;
 	
 	/**
@@ -144,7 +149,17 @@ abstract class AbstractTransaction implements TransactionInterface
     {
     	return $this->paymentMethod;
     }
-    
+
+    public function setProviderName($providerName)
+    {
+        $this->providerName = $providerName;
+    }
+
+    public function getProviderName()
+    {
+        return $this->providerName;
+    }
+
     public function setCardNumber($cardNumber)
     {
     	$this->cardNumber = $cardNumber;

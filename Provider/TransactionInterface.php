@@ -58,12 +58,19 @@ interface TransactionInterface
 	function getReference();
 	
 	/**
-	 * Type of payment (e.g. card type like Visa, Mastercard, ...)
+	 * Type of payment (e.g. Saferpay, Paypal, ...)
 	 */
 	function setPaymentMethod($paymentMethod);
 	
 	function getPaymentMethod();
-	
+
+    /**
+	 * Provider name (e.g. card type like Visa, Mastercard, ...)
+	 */
+	function setProviderName($providerName);
+
+	function getProviderName();
+
 	/**
 	 * Credit card number
 	 */

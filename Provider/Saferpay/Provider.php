@@ -82,7 +82,12 @@ class Provider implements ProviderInterface
             throw new \Exception('Unable to verify transaction: ' . $captureMessage);
         }
         $transaction->setStatus($captureMessage);
+
         $transaction->setPaymentMethod(self::PAYMENT_METHOD);
+
+        // extract provider name
+        preg_match('/PROVIDERNAME="([^"]+)/', $transaction->getResponseMessage(), $matches);
+        $transaction->setProviderName($matches[1]);
     }
 
     /**
