@@ -1,0 +1,10 @@
+{
+    "name": "astina/payment-bundle",
+    "type": "symfony-bundle",
+    "require": {
+    },
+    "autoload": {
+        "psr-0": { "Astina\\Bundle\\PaymentBundle": "" }
+    },
+    "target-dir": "Astina/Bundle/PaymentBundle"
+}
