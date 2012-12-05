@@ -10,6 +10,13 @@ use Astina\Bundle\PaymentBundle\Provider\AbstractTransaction;
  */
 class Transaction extends AbstractTransaction
 {
+    public function __construct()
+    {
+        $this->setPaymentMethod('mock');
+        $this->setProviderName('mock');
+        $this->setTransactionId('mock');
+    }
+
     public function isStatusSuccess()
     {
         return true;
