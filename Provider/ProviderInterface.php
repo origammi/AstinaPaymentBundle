@@ -37,7 +37,7 @@ interface ProviderInterface
 	
 	/**
 	 * @param Request $request
-	 * @return |Astina\Bundle\PaymentBundle\Provider\TransactionInterface
+	 * @return \Astina\Bundle\PaymentBundle\Provider\TransactionInterface
 	 */
 	public function createTransactionFromRequest(Request $request);
 }

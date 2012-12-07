@@ -58,7 +58,7 @@ class Provider implements ProviderInterface
     {
         if($transaction->getResponseMessage() == null ||
            $transaction->getTransactionToken() == null) {
-            throw new \Exception('Unable to authorize transaction without DATA or SIGNATURE: ' . $verificationMessage);
+            throw new \Exception('Unable to authorize transaction without DATA or SIGNATURE');
         }
 
         $verificationMessage = $this->endpoint->verifyPayConfirm($transaction->getResponseMessage(), $transaction->getTransactionToken());
