@@ -53,7 +53,7 @@ class Provider implements ProviderInterface
 	private $sign2;
 	
 	/**
-	 * @var Symfony\Component\HttpKernel\Log\LoggerInterface
+	 * @var LoggerInterface
 	 */
 	private $logger;
 	

@@ -10,9 +10,10 @@ use Symfony\Component\HttpFoundation\Request;
  */
 interface ProviderInterface
 {
-	/**
-	 * @return \Astina\Bundle\PaymentBundle\Provider\TransactionInterface
-	 */
+    /**
+     * @param OrderInterface $order
+     * @return \Astina\Bundle\PaymentBundle\Provider\TransactionInterface
+     */
 	function createTransaction(OrderInterface $order = null);
 
     /**

@@ -55,7 +55,7 @@ abstract class AbstractTransaction implements TransactionInterface
 	private $cardNumber;
 	
 	/**
-     * @ORM\Column(type="string", lenght=16)
+     * @ORM\Column(type="string", length=16)
 	 */
 	private $maskedCardNumber;
 	
