@@ -56,3 +56,13 @@ Service Configuration:
         <argument type="service" id="logger" />
     </service>
 
+Computop Provider
+-----------------
+Only authorization is implemented for now.
+
+    <service id="astina_payment.provider" class="Astina\Bundle\PaymentBundle\Provider\Computop\Provider">
+        <argument>[merchant id]</argument>
+        <argument>[password]</argument>
+        <argument>[hmac key]</argument>
+        <argument>[testing mode true|false]</argument>
+    </service>

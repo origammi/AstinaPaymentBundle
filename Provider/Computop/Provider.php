@@ -20,11 +20,14 @@ class Provider implements ProviderInterface
 
     private $hMacKey;
 
-    public function __construct($merchantId, $password, $hMacKey)
+    private $testingMode;
+
+    public function __construct($merchantId, $password, $hMacKey, $testingMode = false)
     {
         $this->merchantId = $merchantId;
         $this->password = $password;
         $this->hMacKey = $hMacKey;
+        $this->testingMode = $testingMode;
     }
 
     /**
@@ -38,6 +41,10 @@ class Provider implements ProviderInterface
         if ($order) {
             $transaction->setCurrency($order->getCurrency());
             $transaction->setAmount((int) $order->getTotalPrice());
+        }
+
+        if ($this->testingMode) {
+            $transaction->setAmount(10);
         }
 
         return $transaction;
