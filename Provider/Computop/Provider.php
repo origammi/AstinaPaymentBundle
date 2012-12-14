@@ -12,7 +12,7 @@ class Provider implements ProviderInterface
 {
     private $creditCardUrl = 'https://www.netkauf.de/paygate/payssl.aspx';
 
-    private $debitCardUrl = 'https://www.netkauf.de/paygate/payelv.aspx';
+    private $bankTransferUrl = 'https://www.netkauf.de/paygate/payelv.aspx';
 
     private $merchantId;
 
@@ -136,8 +136,8 @@ class Provider implements ProviderInterface
 
     private function findPaymentBaseUrl(TransactionInterface $transaction)
     {
-        if ($transaction->getPaymentMethod() == 'debit') {
-            return $this->debitCardUrl;
+        if ($transaction->getPaymentMethod() == 'bank_transfer') {
+            return $this->bankTransferUrl;
         }
         return $this->creditCardUrl;
     }
