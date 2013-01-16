@@ -9,15 +9,17 @@ use Astina\Bundle\PaymentBundle\Provider\OrderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
-/**
- * @author $Author pkraeutli $
- * @version $Revision$, $Date$
- */
 class Provider implements ProviderInterface
 {	
     public function createTransaction(OrderInterface $order = null)
     {
-    	return new Transaction();
+    	$transaction = new Transaction();
+
+        if ($order) {
+            $transaction->setAmount($order->getTotalPrice());
+        }
+
+        return $transaction;
     }
     
     public function authorizeTransaction(TransactionInterface $transaction)
@@ -38,12 +40,21 @@ class Provider implements ProviderInterface
      */
     function createPaymentUrl(TransactionInterface $transaction, $successUrl = null, $errorUrl = null, $cancelUrl = null, array $params = array())
     {
+        if ($transaction->getAmount()) {
+            $successUrl .= ((strpos($successUrl, '?') === false) ? '?': '&') . '_mock_amount=' . $transaction->getAmount();
+        }
+
         return $successUrl;
     }
 
-
     public function createTransactionFromRequest(Request $request)
     {
-    	return $this->createTransaction();
+    	$transaction = $this->createTransaction();
+
+        if ($amount = $request->get('_mock_amount')) {
+            $transaction->setAmount($amount);
+        }
+
+        return $transaction;
     }
 }
