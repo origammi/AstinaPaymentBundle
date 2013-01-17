@@ -85,9 +85,7 @@ class Provider implements ProviderInterface
 
         $transaction->setPaymentMethod(self::PAYMENT_METHOD);
 
-        // extract provider name
-        preg_match('/PROVIDERNAME="([^"]+)/', $transaction->getResponseMessage(), $matches);
-        $transaction->setProviderName($matches[1]);
+        $transaction->setProviderName($this->getResponseValue('PROVIDERNAME', $transaction->getResponseMessage()));
     }
 
     /**
@@ -116,9 +114,21 @@ class Provider implements ProviderInterface
         // use DATA and SIGNATURE parameters for VerifyPayConfirm
         $transaction = new Transaction();
 
-        $transaction->setResponseMessage($request->get('DATA'));
+        $data = $request->get('DATA');
+
+        $transaction->setResponseMessage($data);
         $transaction->setTransactionToken($request->get('SIGNATURE'));
+        $transaction->setProviderName($this->getResponseValue('PROVIDERNAME', $data));
+        $transaction->setAmount($this->getResponseValue('AMOUNT', $data));
+        $transaction->setCurrency($this->getResponseValue('CURRENCY', $data));
+        $transaction->setTransactionId($this->getResponseValue('ID', $data));
 
         return $transaction;
+    }
+
+    private function getResponseValue($name, $data)
+    {
+        preg_match(sprintf('/%s="([^"]+)/', $name), $data, $matches);
+        return count($matches) > 0 ? $matches[1] : null;
     }
 }
