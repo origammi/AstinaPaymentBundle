@@ -44,7 +44,7 @@ class Provider implements ProviderInterface
         }
 
         if ($this->testingMode) {
-            $transaction->setAmount(10);
+            $transaction->setAmount(100);
         }
 
         return $transaction;
