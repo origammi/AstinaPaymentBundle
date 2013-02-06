@@ -80,7 +80,7 @@ class Provider implements ProviderInterface
             'MerchantID' => $this->merchantId,
             'Response' => 'encrypt',
             'Currency' => $transaction->getCurrency(),
-//            'Capture' => 'MANUAL',
+            'Capture' => 'MANUAL',
             'TransID' => $transaction->getReference(),
             'Amount' => $transaction->getAmount(),
             'URLSuccess' => $successUrl,
