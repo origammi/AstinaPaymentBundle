@@ -42,8 +42,10 @@ class Provider implements ProviderInterface
     {
         $transaction = new Transaction();
 
-        $transaction->setAmount($order->getTotalPrice());
-        $transaction->setCurrency($order->getCurrency());
+        if ($order) {
+            $transaction->setAmount($order->getTotalPrice());
+            $transaction->setCurrency($order->getCurrency());
+        }
 
         // description is mandatory for Saferpay
         $transaction->setReference($this->translator->trans('payment.saferpay.description'));
