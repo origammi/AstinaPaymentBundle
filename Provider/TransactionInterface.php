@@ -56,6 +56,15 @@ interface TransactionInterface
 	function setReference($reference);
 	
 	function getReference();
+
+    /**
+     * Order description
+     *
+     * @param $description
+     */
+    function setDescription($description);
+
+    function getDescription();
 	
 	/**
 	 * Type of payment (e.g. Saferpay, Paypal, ...)

@@ -87,6 +87,10 @@ class Provider implements ProviderInterface
             'URLFailure' => $errorUrl,
         );
 
+        if ($transaction->getDescription()) {
+            $params['OrderDesc'] = $transaction->getDescription();
+        }
+
         $params['MAC'] = $this->createMac($params);
 
 //        $paramStr = http_build_query($params); // params cannot be url encoded!

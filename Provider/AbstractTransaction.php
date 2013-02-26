@@ -9,10 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Base implementation for a Transaction. ORM annotated as mapped superclass so
  * its extending classes could be used as domain entities
- * 
- * @author $Author pkraeutli $
- * @version $Revision$, $Date$
- * 
+ *
  * @ORM\MappedSuperclass
  */
 abstract class AbstractTransaction implements TransactionInterface
@@ -41,7 +38,12 @@ abstract class AbstractTransaction implements TransactionInterface
 	 * @ORM\Column(type="string", length=255, unique=true)
 	 */
 	private $reference;
-	
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $description;
+
 	/**
 	 * @ORM\Column(type="string", length=50)
 	 */
@@ -138,6 +140,16 @@ abstract class AbstractTransaction implements TransactionInterface
     public function getReference()
     {
     	return $this->reference;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
     }
         
     public function setPaymentMethod($paymentMethod)
