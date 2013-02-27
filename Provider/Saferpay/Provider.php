@@ -45,10 +45,11 @@ class Provider implements ProviderInterface
         if ($order) {
             $transaction->setAmount($order->getTotalPrice());
             $transaction->setCurrency($order->getCurrency());
+            $transaction->setReference($order->getOrderNumber());
         }
 
         // description is mandatory for Saferpay
-        $transaction->setReference($this->translator->trans('payment.saferpay.description'));
+        $transaction->setDescription($this->translator->trans('payment.saferpay.description'));
 
         return $transaction;
     }
@@ -124,6 +125,7 @@ class Provider implements ProviderInterface
         $transaction->setAmount($this->getResponseValue('AMOUNT', $data));
         $transaction->setCurrency($this->getResponseValue('CURRENCY', $data));
         $transaction->setTransactionId($this->getResponseValue('ID', $data));
+        $transaction->setReference($this->getResponseValue('ORDERID', $data));
 
         return $transaction;
     }

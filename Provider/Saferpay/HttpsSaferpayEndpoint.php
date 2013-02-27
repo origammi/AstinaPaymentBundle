@@ -78,7 +78,8 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
         $paymentInitParams['ACCOUNTID'] = $this->accountId;
         $paymentInitParams['AMOUNT'] = $transaction->getAmount(); //amount in minor currency unit
         $paymentInitParams['CURRENCY'] = $transaction->getCurrency();
-        $paymentInitParams['DESCRIPTION'] = $transaction->getReference();
+        $paymentInitParams['ORDERID'] = $transaction->getReference();
+        $paymentInitParams['DESCRIPTION'] = $transaction->getDescription();
         $paymentInitParams['VTCONFIG'] = $this->vtConfig;
 
         $paymentInitParams['SUCCESSLINK'] = $successUrl;
