@@ -70,11 +70,13 @@ class Provider implements ProviderInterface
         $apiParams = array(
             'TOKEN' => $transaction->getTransactionToken(),
             'PAYERID' => $transaction->getPayerId(),
-            'PAYMENTACTION' => $transaction->getRequestType(),
-            'AMT' => $transaction->getAmount(),
+            'PAYMENTACTION' => $transaction->getRequestType() ?: 'Sale',
+            'AMT' => ($transaction->getAmount() / 100),
             'CURRENCYCODE' => $transaction->getCurrency(),
-            'IPADDRESS' => $_SERVER['SERVER_NAME'], // XXX
         );
+        if (isset($_SERVER['REMOTE_ADDR'])) {
+            $apiParams['IPADDRESS'] = $_SERVER['REMOTE_ADDR'];
+        }
 
         $response = $this->apiCall('DoExpressCheckoutPayment', $apiParams);
 
@@ -84,7 +86,7 @@ class Provider implements ProviderInterface
     function createPaymentUrl(TransactionInterface $transaction, $successUrl = null, $errorUrl = null, $cancelUrl = null, array $params = array())
     {
         $params = array_merge(array(
-            'AMT' => $transaction->getAmount(),
+            'AMT' => ($transaction->getAmount() / 100),
             //'PAYMENTACTION' => $transaction->getRequestType(), // deprecated
             'PAYMENTREQUEST_0_PAYMENTACTION' => $transaction->getRequestType(),
             'RETURNURl' => $successUrl,
