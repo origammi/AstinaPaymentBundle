@@ -76,7 +76,7 @@ class Provider implements ProviderInterface
      */
     function createPaymentUrl(TransactionInterface $transaction, $successUrl = null, $errorUrl = null, $cancelUrl = null, array $params = array())
     {
-        $params = array(
+        $params = array_merge(array(
             'MerchantID' => $this->merchantId,
             'Response' => 'encrypt',
             'Currency' => $transaction->getCurrency(),
@@ -85,7 +85,7 @@ class Provider implements ProviderInterface
             'Amount' => $transaction->getAmount(),
             'URLSuccess' => $successUrl,
             'URLFailure' => $errorUrl,
-        );
+        ), $params);
 
         if ($transaction->getDescription()) {
             $params['OrderDesc'] = $transaction->getDescription();
