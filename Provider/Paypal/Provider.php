@@ -80,7 +80,9 @@ class Provider implements ProviderInterface
 
         $response = $this->apiCall('DoExpressCheckoutPayment', $apiParams);
 
-        $transaction->setTransactionId($response['PAYMENTINFO_0_TRANSACTIONID']);
+        if (isset($response['PAYMENTINFO_0_TRANSACTIONID'])) {
+            $transaction->setTransactionId($response['PAYMENTINFO_0_TRANSACTIONID']);
+        }
     }
 
     function createPaymentUrl(TransactionInterface $transaction, $successUrl = null, $errorUrl = null, $cancelUrl = null, array $params = array())
