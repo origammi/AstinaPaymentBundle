@@ -118,7 +118,7 @@ class Provider implements ProviderInterface
         $response = $this->apiCall('GetExpressCheckoutDetails', $apiParams);
 
         $transaction = new Transaction();
-        $transaction->setAmount($response['AMT']);
+        $transaction->setAmount($response['AMT'] * 100);
         $transaction->setCurrency($response['CURRENCYCODE']);
         $transaction->setTransactionToken($response['TOKEN']);
         $transaction->setPayerId($response['PAYERID']);
