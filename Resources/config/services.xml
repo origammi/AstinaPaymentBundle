@@ -15,7 +15,7 @@
         <parameter key="astina_payment.paypal.api_endpoint">https://api-3t.paypal.com/nvp</parameter>
         <parameter key="astina_payment.paypal.paypal_url">https://www.paypal.com/webscr&amp;cmd=_express-checkout&amp;token=</parameter>
         <parameter key="astina_payment.paypal.subject"><!-- merchant email address --></parameter>
-        <parameter key="astina_payment.paypal.version">53.0</parameter>
+        <parameter key="astina_payment.paypal.version">63.0</parameter>
     </parameters>
 
     <!--

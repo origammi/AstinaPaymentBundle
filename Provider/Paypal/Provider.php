@@ -13,10 +13,6 @@ use Astina\Bundle\PaymentBundle\Provider\Paypal\Transaction;
 use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * @author $Author: pkraeutli $
- * @version $Revision:  $, $Date: 5/26/12 $
- */
 class Provider implements ProviderInterface
 {
     private $apiUsername;
@@ -38,7 +34,8 @@ class Provider implements ProviderInterface
 
     private $version;
 
-    public function __construct($apiUsername, $apiPassword, $apiSignature, $apiEndpoint, $paypalUrl, $subject, LoggerInterface $logger, $version = '53.0')
+    public function __construct($apiUsername, $apiPassword, $apiSignature, $apiEndpoint, $paypalUrl,
+                                $subject, LoggerInterface $logger, $version = '63.0')
     {
         $this->apiUsername = $apiUsername;
         $this->apiPassword = $apiPassword;
@@ -70,10 +67,14 @@ class Provider implements ProviderInterface
         $apiParams = array(
             'TOKEN' => $transaction->getTransactionToken(),
             'PAYERID' => $transaction->getPayerId(),
-            'PAYMENTACTION' => $transaction->getRequestType() ?: 'Sale',
-            'AMT' => ($transaction->getAmount() / 100),
-            'CURRENCYCODE' => $transaction->getCurrency(),
+            // 'PAYMENTACTION' => $transaction->getRequestType() ?: 'Sale', // deprecated
+            'PAYMENTREQUEST_0_PAYMENTACTION' => $transaction->getRequestType() ?: 'Sale',
+            'PAYMENTREQUEST_0_AMT' => ($transaction->getAmount() / 100),
+            'PAYMENTREQUEST_0_CURRENCYCODE' => $transaction->getCurrency(),
         );
+        if ($ref = $transaction->getReference()) {
+            $apiParams['PAYMENTREQUEST_0_DESC'] = $ref;
+        }
         if (isset($_SERVER['REMOTE_ADDR'])) {
             $apiParams['IPADDRESS'] = $_SERVER['REMOTE_ADDR'];
         }
