@@ -43,10 +43,6 @@ class Provider implements ProviderInterface
             $transaction->setAmount((int) $order->getTotalPrice());
         }
 
-        if ($this->testingMode) {
-            $transaction->setAmount(100);
-        }
-
         return $transaction;
     }
 
@@ -87,11 +83,15 @@ class Provider implements ProviderInterface
             'URLFailure' => $errorUrl,
         ), $params);
 
-        if ($transaction->getDescription()) {
+        if (!isset($params['OrderDesc']) && $transaction->getDescription()) {
             $params['OrderDesc'] = $transaction->getDescription();
         }
 
         $params['MAC'] = $this->createMac($params);
+
+        if ($this->testingMode) {
+            $params['amount'] = 100;
+        }
 
 //        $paramStr = http_build_query($params); // params cannot be url encoded!
         $paramStr = $this->createParamStr($params);
