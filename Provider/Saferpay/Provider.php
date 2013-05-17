@@ -38,7 +38,7 @@ class Provider implements ProviderInterface
     /**
      * @return \Astina\Bundle\PaymentBundle\Provider\TransactionInterface
      */
-    function createTransaction(OrderInterface $order = null)
+    public function createTransaction(OrderInterface $order = null)
     {
         $transaction = new Transaction();
 
@@ -57,7 +57,7 @@ class Provider implements ProviderInterface
     /**
      * @param \Astina\Bundle\PaymentBundle\Provider\TransactionInterface $transaction
      */
-    function authorizeTransaction(TransactionInterface $transaction)
+    public function authorizeTransaction(TransactionInterface $transaction)
     {
         if($transaction->getResponseMessage() == null ||
            $transaction->getTransactionToken() == null) {
@@ -73,12 +73,16 @@ class Provider implements ProviderInterface
         preg_match('/ID=([^&]+)/', $verificationMessage, $matches);
 
         $transaction->setTransactionId($matches[1]);
+
+        if ($providerName = $this->findProviderName($transaction)) {
+        	$transaction->setProviderName($providerName);
+        }
     }
 
     /**
      * @param TransactionInterface $transaction
      */
-    function captureTransaction(TransactionInterface $transaction)
+    public function captureTransaction(TransactionInterface $transaction)
     {
         $captureMessage = $this->endpoint->createPayComplete($transaction->getTransactionId());
         if(substr($captureMessage, 0, 2) != 'OK') {
@@ -88,7 +92,14 @@ class Provider implements ProviderInterface
 
         $transaction->setPaymentMethod(self::PAYMENT_METHOD);
 
-        $transaction->setProviderName($this->getResponseValue('PROVIDERNAME', $transaction->getResponseMessage()));
+        if ($providerName = $this->findProviderName($transaction)) {
+        	$transaction->setProviderName($providerName);
+        }
+    }
+
+    private function findProviderName(TransactionInterface $transaction)
+    {
+    	return $this->getResponseValue('PROVIDERNAME', $transaction->getResponseMessage());
     }
 
     /**
@@ -99,7 +110,7 @@ class Provider implements ProviderInterface
      * @param array $params
      * @return string
      */
-    function createPaymentUrl(TransactionInterface $transaction,
+    public function createPaymentUrl(TransactionInterface $transaction,
                               $successUrl = null,
                               $errorUrl = null,
                               $cancelUrl = null,
