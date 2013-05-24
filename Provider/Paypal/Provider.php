@@ -51,8 +51,10 @@ class Provider implements ProviderInterface
     {
         $transaction = new Transaction();
 
-        $transaction->setAmount($order->getTotalPrice());
-        $transaction->setCurrency($order->getCurrency());
+        if ($order) {
+        	$transaction->setAmount($order->getTotalPrice());
+        	$transaction->setCurrency($order->getCurrency());	
+        }
 
         return $transaction;
     }
