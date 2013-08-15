@@ -162,13 +162,13 @@ class Provider implements ProviderInterface
         parse_str($plain, $params);
 
         $transaction = $this->createTransaction();
-        $transaction->setTransactionId($params['PayID']);
-        $transaction->setTransactionToken($params['XID']);
-        $transaction->setReference($params['TransID']);
-        $transaction->setRequestType($params['Type']);
-        $transaction->setResponseCode($params['Code']);
-        $transaction->setStatus($params['Status']);
-        $transaction->setResponseMessage($params['Description']);
+        $transaction->setTransactionId(isset($params['PayID']) ? $params['PayID'] : null);
+        $transaction->setTransactionToken(isset($params['XID']) ? $params['XID'] : null);
+        $transaction->setReference(isset($params['TransID']) ? $params['TransID'] : null);
+        $transaction->setRequestType(isset($params['Type']) ? $params['Type'] : null);
+        $transaction->setResponseCode(isset($params['Code']) ? $params['Code'] : null);
+        $transaction->setStatus(isset($params['Status']) ? $params['Status'] : null);
+        $transaction->setResponseMessage(isset($params['Description']) ? $params['Description'] : null);
 
         return $transaction;
     }
