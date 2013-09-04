@@ -2,6 +2,7 @@
 
 namespace Astina\Bundle\PaymentBundle\Provider\Saferpay;
 
+use Astina\Bundle\PaymentBundle\Provider\PaymentException;
 use Astina\Bundle\PaymentBundle\Provider\TransactionInterface;
 
 class HttpsSaferpayEndpoint implements SaferpayEndpoint
@@ -119,7 +120,11 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
         $response = curl_exec($curl);
 
         if (!$response) {
-            throw new ApiException('Saferpay API unreachable');
+            throw new PaymentException('Saferpay API unreachable');
+        }
+
+        if (strpos($response, 'https') !== 0) {
+            throw new PaymentException($response);
         }
 
         return $response;
