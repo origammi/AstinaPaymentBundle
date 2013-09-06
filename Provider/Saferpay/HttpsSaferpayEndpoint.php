@@ -123,7 +123,7 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
             throw new PaymentException('Saferpay API unreachable');
         }
 
-        if (strpos($response, 'https') !== 0) {
+        if (strpos($response, 'ERROR:') === 0) {
             throw new PaymentException($response);
         }
 
