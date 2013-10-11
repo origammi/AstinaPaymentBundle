@@ -2,12 +2,6 @@
 
 namespace Astina\Bundle\PaymentBundle\Provider\Datatrans;
 
-use Astina\Bundle\PaymentBundle\Provider\TransactionInterface;
-
-/**
- * @author $Author pkraeutli $
- * @version $Revision$, $Date$
- */
 abstract class XmlRequest
 {
 	protected $doc;
@@ -15,7 +9,7 @@ abstract class XmlRequest
 	protected $merchantId;
 	
 	/**
-     * @var Astina\Bundle\PaymentBundle\Provider\TransactionInterface
+     * @var \Astina\Bundle\PaymentBundle\Provider\TransactionInterface
 	 */
 	protected $transaction;
 	

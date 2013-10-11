@@ -3,13 +3,13 @@
 namespace Astina\Bundle\PaymentBundle\Provider\Saferpay;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
-
 use Astina\Bundle\PaymentBundle\Provider\ProviderInterface;
 use Astina\Bundle\PaymentBundle\Provider\OrderInterface;
 use Astina\Bundle\PaymentBundle\Provider\TransactionInterface;
 use Astina\Bundle\PaymentBundle\Provider\Saferpay\SaferpayEndpoint;
+use Psr\Log\LoggerInterface;
+
 /**
  * Saferpay Provider for V4.1.6
  *
@@ -36,6 +36,7 @@ class Provider implements ProviderInterface
     }
 
     /**
+     * @param \Astina\Bundle\PaymentBundle\Provider\OrderInterface $order
      * @return \Astina\Bundle\PaymentBundle\Provider\TransactionInterface
      */
     public function createTransaction(OrderInterface $order = null)
@@ -56,6 +57,7 @@ class Provider implements ProviderInterface
 
     /**
      * @param \Astina\Bundle\PaymentBundle\Provider\TransactionInterface $transaction
+     * @throws \Exception
      */
     public function authorizeTransaction(TransactionInterface $transaction)
     {
@@ -77,10 +79,13 @@ class Provider implements ProviderInterface
         if ($providerName = $this->findProviderName($transaction)) {
         	$transaction->setProviderName($providerName);
         }
+
+        $this->logger->info('Authorized Saferpay transaction', array('transactionId' => $transaction->getTransactionId()));
     }
 
     /**
      * @param TransactionInterface $transaction
+     * @throws \Exception
      */
     public function captureTransaction(TransactionInterface $transaction)
     {
@@ -95,6 +100,8 @@ class Provider implements ProviderInterface
         if ($providerName = $this->findProviderName($transaction)) {
         	$transaction->setProviderName($providerName);
         }
+
+        $this->logger->info('Captured Saferpay transaction', array('transactionId' => $transaction->getTransactionId()));
     }
 
     private function findProviderName(TransactionInterface $transaction)
@@ -120,8 +127,9 @@ class Provider implements ProviderInterface
     }
 
     /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
      * @param Request $request
-     * @return |Astina\Bundle\PaymentBundle\Provider\TransactionInterface
+     * @return \Astina\Bundle\PaymentBundle\Provider\Saferpay\Transaction|\Astina\Bundle\PaymentBundle\Provider\TransactionInterface
      */
     public function createTransactionFromRequest(Request $request)
     {
@@ -144,6 +152,7 @@ class Provider implements ProviderInterface
     private function getResponseValue($name, $data)
     {
         preg_match(sprintf('/%s="([^"]+)/', $name), $data, $matches);
+
         return count($matches) > 0 ? $matches[1] : null;
     }
 }

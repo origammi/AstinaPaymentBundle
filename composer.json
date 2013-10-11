@@ -12,6 +12,7 @@
         }
     ],
     "require": {
+        "symfony/symfony": "~2.0"
     },
     "autoload": {
         "psr-0": { "Astina\\Bundle\\PaymentBundle": "" }

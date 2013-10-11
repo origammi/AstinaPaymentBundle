@@ -7,16 +7,12 @@ use Astina\Bundle\PaymentBundle\Provider\AuthorizationException;
 use Astina\Bundle\PaymentBundle\Provider\TransactionInterface;
 use Astina\Bundle\PaymentBundle\Provider\ProviderInterface;
 use Astina\Bundle\PaymentBundle\Provider\OrderInterface;
-
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Datatrans provider
  * See https://pilot.datatrans.biz/showcase/doc/Technical_Implementation_Guide.pdf for specs
- * 
- * @author $Author pkraeutli $
- * @version $Revision$, $Date$
  */
 class Provider implements ProviderInterface
 {

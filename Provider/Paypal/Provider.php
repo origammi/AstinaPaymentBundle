@@ -2,15 +2,11 @@
 
 namespace Astina\Bundle\PaymentBundle\Provider\Paypal;
 
-use Astina\Bundle\PaymentBundle\Provider\SecurityException;
-use Astina\Bundle\PaymentBundle\Provider\AuthorizationException;
-use Astina\Bundle\PaymentBundle\Provider\PaymentException;
 use Astina\Bundle\PaymentBundle\Provider\TransactionInterface;
 use Astina\Bundle\PaymentBundle\Provider\ProviderInterface;
 use Astina\Bundle\PaymentBundle\Provider\OrderInterface;
 use Astina\Bundle\PaymentBundle\Provider\Paypal\Transaction;
-
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class Provider implements ProviderInterface

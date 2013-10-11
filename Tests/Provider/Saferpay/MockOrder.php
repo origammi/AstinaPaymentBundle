@@ -25,4 +25,9 @@ class MockOrder implements OrderInterface
     {
         return 'CHF';
     }
+
+    public function getOrderNumber()
+    {
+        return '123456';
+    }
 }

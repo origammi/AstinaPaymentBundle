@@ -5,9 +5,7 @@ namespace Astina\Bundle\PaymentBundle\Provider\Mock;
 use Astina\Bundle\PaymentBundle\Provider\TransactionInterface;
 use Astina\Bundle\PaymentBundle\Provider\ProviderInterface;
 use Astina\Bundle\PaymentBundle\Provider\OrderInterface;
-
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 class Provider implements ProviderInterface
 {	

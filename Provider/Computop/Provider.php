@@ -48,18 +48,20 @@ class Provider implements ProviderInterface
 
     /**
      * @param \Astina\Bundle\PaymentBundle\Provider\TransactionInterface $transaction
+     * @throws \Exception
      */
     function authorizeTransaction(TransactionInterface $transaction)
     {
-        // TODO: Implement authorizeTransaction() method.
+        throw new \Exception('This method is not supported by Computop provider');
     }
 
     /**
      * @param TransactionInterface $transaction
+     * @throws \Exception
      */
     function captureTransaction(TransactionInterface $transaction)
     {
-        // TODO: Implement captureTransaction() method.
+        throw new \Exception('This method is not supported by Computop provider');
     }
 
     /**
