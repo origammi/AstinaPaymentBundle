@@ -1,6 +1,8 @@
 AstinaPaymentBundle
 ===================
 
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/efe39f01-ae60-49e0-afef-129d4b03b527/mini.png)](https://insight.sensiolabs.com/projects/efe39f01-ae60-49e0-afef-129d4b03b527)
+
 Datatrans Provider
 ------------------
 
