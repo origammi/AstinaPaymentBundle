@@ -14,7 +14,7 @@ Service configuration:
         <argument>%astina_payment.datatrans.authorizexmlurl%</argument>
         <argument>%astina_payment.datatrans.capturexmlurl%</argument>
         <argument>%astina_payment.datatrans.sign%</argument>
-        <argument>%astina_payment.datatrans.sign%</argument>
+        <argument>%astina_payment.datatrans.sign2%</argument>
         <argument type="service" id="logger" />
     </service>
 
