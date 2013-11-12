@@ -53,9 +53,9 @@ class Provider implements ProviderInterface
 	 */
 	private $logger;
 	
-	const REQTYPE_NOA = 'NOA';
-	const REQTYPE_CAA = 'CAA';
-	const REQTYPE_CAO = 'CAO';
+	const REQTYPE_NOA = 'NOA'; // authorize
+	const REQTYPE_CAA = 'CAA'; // authorize and capture
+	const REQTYPE_CAO = 'CAO'; // capture
 	
 	const RESPONSE_CODE_OK = '01';
 	
@@ -80,6 +80,8 @@ class Provider implements ProviderInterface
     	 * the request/user locale. set here only to assure it is not null
     	 */
     	$transaction->setLanguage('de');
+
+        $transaction->setRequestType(self::REQTYPE_NOA);
     	
     	return $transaction;
     }
