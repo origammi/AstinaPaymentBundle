@@ -7,7 +7,6 @@ use Symfony\Component\Translation\Translator;
 use Astina\Bundle\PaymentBundle\Provider\ProviderInterface;
 use Astina\Bundle\PaymentBundle\Provider\OrderInterface;
 use Astina\Bundle\PaymentBundle\Provider\TransactionInterface;
-use Astina\Bundle\PaymentBundle\Provider\Saferpay\SaferpayEndpoint;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -24,7 +23,7 @@ class Provider implements ProviderInterface
 
     private $translator;
 
-    /** @var $logger \Symfony\Component\HttpKernel\Log\LoggerInterface */
+    /** @var $logger LoggerInterface */
     private $logger;
 
     public function __construct(SaferpayEndpoint $endpoint,
@@ -33,6 +32,7 @@ class Provider implements ProviderInterface
     {
         $this->endpoint = $endpoint;
         $this->translator = $translator;
+        $this->logger = $logger;
     }
 
     /**
