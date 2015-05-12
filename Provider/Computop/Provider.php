@@ -14,6 +14,8 @@ class Provider implements ProviderInterface
 
     private $bankTransferUrl = 'https://www.netkauf.de/paygate/payelv.aspx';
 
+    private $paypalUrl = 'https://www.computop-paygate.com/paypal.aspx';
+
     private $merchantId;
 
     private $password;
@@ -144,7 +146,10 @@ class Provider implements ProviderInterface
     {
         if ($transaction->getPaymentMethod() == 'bank_transfer') {
             return $this->bankTransferUrl;
+        } else if ($transaction->getPaymentMethod() == 'paypal') {
+            return $this->paypalUrl;
         }
+
         return $this->creditCardUrl;
     }
 
