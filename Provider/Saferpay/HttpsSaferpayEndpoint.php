@@ -16,8 +16,8 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
     /** @var string $password */
     private $password;
 
-    /** @var string $environment */
-    private $environment;
+    /** @var string $testmode */
+    private $testmode;
 
     /** @var string $vtConfig */
     private $vtConfig;
@@ -27,13 +27,13 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
     public function __construct($logger,
                                 $accountId,
                                 $password = null,
-                                $environment,
+                                $testmode,
                                 $vtConfig = null)
     {
         $this->logger = $logger;
         $this->accountId = $accountId;
         $this->password = $password;
-        $this->environment = $environment;
+        $this->testmode = $testmode;
         $this->vtConfig = $vtConfig;
     }
 
@@ -109,7 +109,7 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
             $data[] = sprintf('%s=%s', urlencode($name), urlencode($value));
         }
 
-        if ($this->environment == 'test') {
+        if ($this->testmode == true) {
             $url = self::SAFERPAY_TEST_URL . $page . '?' . implode('&', $data);
         }
         else {
