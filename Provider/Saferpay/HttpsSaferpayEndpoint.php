@@ -109,7 +109,7 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
             $data[] = sprintf('%s=%s', urlencode($name), urlencode($value));
         }
 
-        if ($this->environment = 'test') {
+        if ($this->environment == 'test') {
             $url = self::SAFERPAY_TEST_URL . $page . '?' . implode('&', $data);
         }
         else {
