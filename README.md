@@ -68,3 +68,18 @@ Only authorization is implemented for now.
         <argument>[hmac key]</argument>
         <argument>[testing mode true|false]</argument>
     </service>
+
+Updating to version 2.0
+-----------------
+This release introduces an $environment variable for HttpsSaferpayEndpoint.php. If the environment is 'test', the payment information will be sent to the testing API 'https://test.saferpay.com/hosting/'.
+
+To adapt the environment variable in your project, follow these steps:
+
+- In your composer.json, make sure that version 2.0.x is used: "astina/payment-bundle": "~2.0"
+
+- In your services.xml where you define the SaferpayEndpoint service, add the environment as argument:
+ ```<service id="astina_payment.saferpay.endpoint" class="%astina_payment.saferpay.endpoint.class%"> <argument type="service" id="logger" /> <argument>%astina_payment.saferpay.accountId%</argument> <argument>%astina_payment.saferpay.password%</argument> <argument>%astina_payment.saferpay.environment%</argument> </service>```
+
+- In your parameters.yml, set the environment to either test or production.
+
+- In your parameters.yml.dist, don't forget to set the default value astina_payment.saferpay.environment: test.
