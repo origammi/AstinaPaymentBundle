@@ -8,16 +8,12 @@ use Astina\Bundle\PaymentBundle\Provider\TransactionInterface;
 class HttpsSaferpayEndpoint implements SaferpayEndpoint
 {
     const SAFERPAY_BASE_URL = 'https://www.saferpay.com/hosting/';
-    const SAFERPAY_TEST_URL = 'https://test.saferpay.com/hosting/';
 
     /** @var string $accountId */
     private $accountId;
 
     /** @var string $password */
     private $password;
-
-    /** @var string $environment */
-    private $environment;
 
     /** @var string $vtConfig */
     private $vtConfig;
@@ -27,13 +23,11 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
     public function __construct($logger,
                                 $accountId,
                                 $password = null,
-                                $environment,
                                 $vtConfig = null)
     {
         $this->logger = $logger;
         $this->accountId = $accountId;
         $this->password = $password;
-        $this->environment = $environment;
         $this->vtConfig = $vtConfig;
     }
 
@@ -109,12 +103,7 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
             $data[] = sprintf('%s=%s', urlencode($name), urlencode($value));
         }
 
-        if ($this->environment = 'test') {
-            $url = self::SAFERPAY_TEST_URL . $page . '?' . implode('&', $data);
-        }
-        else {
-            $url = self::SAFERPAY_BASE_URL . $page . '?' . implode('&', $data);
-        }
+        $url = self::SAFERPAY_BASE_URL . $page . '?' . implode('&', $data);
 
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_VERBOSE, 1);
