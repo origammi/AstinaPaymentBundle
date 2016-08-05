@@ -79,12 +79,12 @@ To adapt the testmode variable in your project, follow these steps:
 
 - In your services.xml where you define the SaferpayEndpoint service, add the testmode as argument:
 
-    <service id="astina_payment.saferpay.endpoint" class="%astina_payment.saferpay.endpoint.class%">
-        <argument type="service" id="logger" />
-        <argument>%astina_payment.saferpay.accountId%</argument>
-        <argument>%astina_payment.saferpay.password%</argument>
-        <argument>%astina_payment.saferpay.testmode%</argument>
-    </service>
+        <service id="astina_payment.saferpay.endpoint" class="%astina_payment.saferpay.endpoint.class%">
+            <argument type="service" id="logger" />
+            <argument>%astina_payment.saferpay.accountId%</argument>
+            <argument>%astina_payment.saferpay.password%</argument>
+            <argument>%astina_payment.saferpay.testmode%</argument>
+        </service>
 
 - In your parameters.yml, set the environment to either true (for testing) or false (production).
 
