@@ -1,5 +1,5 @@
 {
-    "name": "astina/payment-bundle",
+    "name": "origammi/payment-bundle",
     "type": "symfony-bundle",
     "description": "Symfony2 bundle integrating various e-payment providers",
     "keywords": ["astina", "injection"],
