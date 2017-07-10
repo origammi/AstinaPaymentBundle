@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class Provider implements ProviderInterface
 {
-    private $creditCardUrl = 'https://www.netkauf.de/paygate/payssl.aspx';
+    private $creditCardUrl = 'https://www.computop-paygate.com/payssl.aspx';
 
-    private $bankTransferUrl = 'https://www.netkauf.de/paygate/payelv.aspx';
+    private $bankTransferUrl = 'https://www.computop-paygate.com/payelv.aspx';
 
     private $merchantId;
 
