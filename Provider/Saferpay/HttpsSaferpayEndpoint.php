@@ -4,6 +4,7 @@ namespace Astina\Bundle\PaymentBundle\Provider\Saferpay;
 
 use Astina\Bundle\PaymentBundle\Provider\PaymentException;
 use Astina\Bundle\PaymentBundle\Provider\TransactionInterface;
+use Psr\Log\LoggerInterface;
 
 class HttpsSaferpayEndpoint implements SaferpayEndpoint
 {
@@ -22,9 +23,12 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
     /** @var string $vtConfig */
     private $vtConfig;
 
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
 
-    public function __construct($logger,
+    public function __construct(LoggerInterface $logger,
                                 $accountId,
                                 $password = null,
                                 $testmode,
