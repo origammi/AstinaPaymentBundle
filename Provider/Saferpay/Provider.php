@@ -3,7 +3,6 @@
 namespace Astina\Bundle\PaymentBundle\Provider\Saferpay;
 
 use Astina\Bundle\PaymentBundle\Provider\PaymentException;
-use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 use Astina\Bundle\PaymentBundle\Provider\ProviderInterface;
@@ -25,10 +24,14 @@ class Provider implements ProviderInterface
     /** @var $logger LoggerInterface */
     private $logger;
 
+    /** @var SaferpayEndpoint $endpoint*/
+    private $endpoint;
+
     public function __construct(SaferpayEndpoint $endpoint,
         TranslatorInterface $translator,
         LoggerInterface $logger)
     {
+        $this->endpoint = $endpoint;
         $this->translator = $translator;
         $this->logger = $logger;
     }
@@ -68,57 +71,12 @@ class Provider implements ProviderInterface
      */
     public function captureTransaction(TransactionInterface $transaction)
     {
-        $response = $this->executeRequest('Payment/v1/Transaction/Capture', [
-            'TransactionReference' => [
-                'TransactionId' => $transaction->getTransactionId(),
-            ]
-        ]);
+        $response = $this->endpoint->createPayComplete($transaction->getTransactionId());
 
         $transaction->setStatus($response['Status']);
-
         $transaction->setPaymentMethod(self::PAYMENT_METHOD);
 
-        if ($providerName = $this->findProviderName($transaction)) {
-            $transaction->setProviderName($providerName);
-        }
-
         $this->logger->info('Captured Saferpay transaction', array('transactionId' => $transaction->getTransactionId()));
-    }
-
-    private function findProviderName(TransactionInterface $transaction)
-    {
-        return $this->getResponseValue('PROVIDERNAME', $transaction->getResponseMessage());
-    }
-
-    /**
-     * @param string $endpoint
-     * @param array $params
-     *
-     * @return array
-     */
-    private function executeRequest($endpoint, $params): array
-    {
-        $header = [
-            'RequestHeader' => [
-                'SpecVersion' => $specVersion,
-                'CustomerId' => $customerId,
-                "RequestId" => "QQQQ",
-                "RetryIndicator" => 0
-            ],
-            'TerminalId' => $terminalId,
-        ];
-
-
-        $client = new Client();
-        $response = $client->post(
-            'https://test.saferpay.com/api/' . $endpoint,
-            [
-                'json' => $header + $params,
-                'auth' => [$username, $password],
-            ]
-        );
-
-        return json_decode($response->getBody()->getContents(), true);
     }
 
     /**
@@ -135,9 +93,7 @@ class Provider implements ProviderInterface
         $cancelUrl = null,
         array $params = array())
     {
-        $response = $this->initializePayment($successUrl, $errorUrl, $cancelUrl, $params);
-
-        return $response['url'];
+        return $this->endpoint->retrievePaymentLink($transaction, $successUrl, $errorUrl, $cancelUrl, $params);
     }
 
     /**
@@ -146,7 +102,7 @@ class Provider implements ProviderInterface
      * @param string $errorUrl
      * @param string $cancelUrl
      * @param array $params
-     * @return string
+     * @return array
      */
     public function initializePayment(TransactionInterface $transaction,
         $successUrl = null,
@@ -154,40 +110,7 @@ class Provider implements ProviderInterface
         $cancelUrl = null,
         array $params = array())
     {
-        $queryParams = [
-            'Payment' => [
-                'Amount' => [
-                    'Value' => $transaction->getAmount(),
-                    'CurrencyCode' => $transaction->getCurrency(),
-                ],
-                'OrderId' => isset($params['ORDERID']) ? $params['ORDERID'] : '',
-                'Description' => 'Order #'.isset($params['ORDERID']) ? $params['ORDERID'] : '',
-            ],
-            'Payer' => [
-                'LanguageCode' => isset($params['LANGID']) ? $params['LANGID'] : 'de',
-            ],
-            'ReturnUrls' => [
-                'Success' => $successUrl,
-                'Fail' => $errorUrl,
-                'Abort' => $cancelUrl,
-            ],
-            'Notification' => [
-                'NotifyUrl' => isset($params['NOTIFYURL']) ? $params['NOTIFYURL'] : '',
-            ],
-        ];
-
-        $response = $this->executeRequest('Payment/v1/PaymentPage/Initialize', $queryParams);
-
-        $redirectUrl = isset($response['RedirectUrl']) ? $response['RedirectUrl'] : null;
-        $token = isset($response['Token']) ? $response['Token'] : null;
-        if (empty($redirectUrl) || empty($token)) {
-            throw new PaymentException('Failed to initialize payment');
-        }
-
-        return [
-            'redirectUrl' => $redirectUrl,
-            'token' => $token,
-        ];
+        return $this->endpoint->initializePayment($transaction, $successUrl, $errorUrl, $cancelUrl, $params);
     }
 
     /**
@@ -198,7 +121,11 @@ class Provider implements ProviderInterface
     public function createTransactionFromRequest(Request $request)
     {
         $paymentToken = $request->attributes->get('paymentToken');
-        $data = $this->executeRequest('Payment/v1/PaymentPage/Assert', ['Token' => $paymentToken]);
+        if (!$paymentToken) {
+            throw new PaymentException('"paymentToken" is expected at request attributes');
+        }
+
+        $data = $this->endpoint->assertPayment($paymentToken);
 
         $transactionData = $data['Transaction'] ?? [];
         $transaction = new Transaction();
@@ -212,12 +139,5 @@ class Provider implements ProviderInterface
         $transaction->setReference($transactionData['OrderId']);
 
         return $transaction;
-    }
-
-    private function getResponseValue($name, $data)
-    {
-        preg_match(sprintf('/%s="([^"]+)/', $name), $data, $matches);
-
-        return count($matches) > 0 ? $matches[1] : null;
     }
 }

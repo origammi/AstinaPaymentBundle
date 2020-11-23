@@ -12,7 +12,13 @@ interface SaferpayEndpoint
      */
     public function retrievePaymentLink(TransactionInterface $transaction, $successUrl, $errorUrl, $cancelUrl, $params);
 
-    public function verifyPayConfirm($data, $signature);
+    public function assertPayment($paymentToken);
 
     public function createPayComplete($transactionId);
+
+    public function initializePayment(TransactionInterface $transaction,
+        $successUrl = null,
+        $errorUrl = null,
+        $cancelUrl = null,
+        array $params = array());
 }
