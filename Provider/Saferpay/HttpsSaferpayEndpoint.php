@@ -4,12 +4,15 @@ namespace Astina\Bundle\PaymentBundle\Provider\Saferpay;
 
 use Astina\Bundle\PaymentBundle\Provider\PaymentException;
 use Astina\Bundle\PaymentBundle\Provider\TransactionInterface;
+use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
 
 class HttpsSaferpayEndpoint implements SaferpayEndpoint
 {
-    const SAFERPAY_BASE_URL = 'https://www.saferpay.com/hosting/';
-    const SAFERPAY_TEST_URL = 'https://test.saferpay.com/hosting/';
+    const SAFERPAY_BASE_URL = 'https://www.saferpay.com/api/';
+    const SAFERPAY_TEST_URL = 'https://test.saferpay.com/api/';
+    const SPEC_VERSION = '1.20';
 
     /** @var string $accountId */
     private $accountId;
@@ -19,26 +22,43 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
 
     /** @var string $testmode */
     private $testmode;
-
-    /** @var string $vtConfig */
-    private $vtConfig;
-
     /**
      * @var LoggerInterface
      */
     private $logger;
 
+    /**
+     * @var string
+     */
+    private $terminalId;
+
+    /**
+     * @var string
+     */
+    private $username;
+
     public function __construct(LoggerInterface $logger,
                                 $accountId,
                                 $password = null,
-                                $testmode,
-                                $vtConfig = null)
+                                $testmode = true,
+                                $vtConfig = null,
+                                $username = null,
+                                $terminalId = null)
     {
+        if (!$terminalId) {
+            throw new PaymentException('Terminal ID is required');
+        }
+
+        if (!$username || !$password) {
+            throw new PaymentException('Username and password is required');
+        }
+
         $this->logger = $logger;
         $this->accountId = $accountId;
+        $this->username = $username;
         $this->password = $password;
         $this->testmode = $testmode;
-        $this->vtConfig = $vtConfig;
+        $this->terminalId = $terminalId;
     }
 
     /**
@@ -51,97 +71,118 @@ class HttpsSaferpayEndpoint implements SaferpayEndpoint
      */
     public function retrievePaymentLink(TransactionInterface $transaction, $successUrl, $errorUrl, $cancelUrl, $params)
     {
-        $paymentInitParams = $this->generatePaymentInitParams($transaction, $successUrl, $errorUrl, $cancelUrl, $params);
+        $response = $this->initializePayment($successUrl, $errorUrl, $cancelUrl, $params);
 
-        return $this->apiCall('CreatePayInit.asp', $paymentInitParams);
+        return $response['url'];
     }
 
-    public function verifyPayConfirm($data, $signature)
+    /**
+     * @param TransactionInterface $transaction
+     * @param string $successUrl
+     * @param string $errorUrl
+     * @param string $cancelUrl
+     * @param array $params
+     *
+     * @return array
+     */
+    public function initializePayment(TransactionInterface $transaction,
+        $successUrl = null,
+        $errorUrl = null,
+        $cancelUrl = null,
+        array $params = array())
     {
-        $payConfirmParams = array();
-        $payConfirmParams['DATA'] = $data;
-        $payConfirmParams['SIGNATURE'] = $signature;
+        $queryParams = [
+            'Payment' => [
+                'Amount' => [
+                    'Value' => $transaction->getAmount(),
+                    'CurrencyCode' => $transaction->getCurrency(),
+                ],
+                'OrderId' => $params['ORDERID'] ?? '',
+                'Description' => $transaction->getDescription(),
+            ],
+            'Payer' => [
+                'LanguageCode' => $params['LANGID'] ?? 'de',
+            ],
+            'ReturnUrls' => [
+                'Success' => $successUrl,
+                'Fail' => $errorUrl,
+                'Abort' => $cancelUrl,
+            ],
+            'Notification' => [
+                'NotifyUrl' => $params['NOTIFYURL'] ?? '',
+            ],
+        ];
 
-        return $this->apiCall('VerifyPayConfirm.asp', $payConfirmParams);
+        $response = $this->executeRequest('Payment/v1/PaymentPage/Initialize', $queryParams);
+
+        $redirectUrl = $response['RedirectUrl'] ?? null;
+        $token = $response['Token'] ?? null;
+        if (empty($redirectUrl) || empty($token)) {
+            throw new PaymentException('Failed to initialize payment');
+        }
+
+        return [
+            'redirectUrl' => $redirectUrl,
+            'token' => $token,
+        ];
+    }
+
+    /**
+     * @param $paymentToken
+     * @return array
+     */
+    public function assertPayment($paymentToken)
+    {
+        $assert = $this->executeRequest('Payment/v1/PaymentPage/Assert', [
+            'Token' => $paymentToken
+        ]);
+
+        return $assert;
     }
 
     public function createPayComplete($transactionId)
     {
-        $payCompleteParams = array();
-        $payCompleteParams['ACCOUNTID'] = $this->accountId;
-        $payCompleteParams['ID'] = $transactionId;
+        $payComplete =  $this->executeRequest('Payment/v1/Transaction/Capture', [
+            'TransactionReference' => [
+                'TransactionId' => $transactionId,
+            ]
+        ]);
 
-        if($this->password) {
-            $payCompleteParams['spPassword'] = $this->password;
-        }
-
-        return $this->apiCall('PayCompleteV2.asp', $payCompleteParams);
+        return $payComplete;
     }
 
-    public function generatePaymentInitParams(TransactionInterface $transaction,
-                                              $successUrl = null,
-                                              $errorUrl = null,
-                                              $cancelUrl = null,
-                                              array $params = array())
+    /**
+     * @param string $endpoint
+     * @param array $params
+     *
+     * @return array
+     */
+    private function executeRequest($endpoint, $params): array
     {
-        $paymentInitParams = array();
+        $header = [
+            'RequestHeader' => [
+                'SpecVersion' => self::SPEC_VERSION,
+                'CustomerId' => $this->accountId,
+                "RequestId" => Uuid::uuid4()->toString(),
+                "RetryIndicator" => 0
+            ],
+            'TerminalId' => $this->terminalId,
+        ];
 
-        $paymentInitParams['ACCOUNTID'] = $this->accountId;
-        $paymentInitParams['AMOUNT'] = $transaction->getAmount(); //amount in minor currency unit
-        $paymentInitParams['CURRENCY'] = $transaction->getCurrency();
-        $paymentInitParams['ORDERID'] = $transaction->getReference();
-        $paymentInitParams['DESCRIPTION'] = $transaction->getDescription();
-        $paymentInitParams['VTCONFIG'] = $this->vtConfig;
+        $json = $header + $params;
+        $this->logger->debug('Sending Saferpay API request: ' . $endpoint, $json);
 
-        $paymentInitParams['SUCCESSLINK'] = $successUrl;
-        $paymentInitParams['FAILLINK'] = $errorUrl;
-        $paymentInitParams['BACKLINK'] = $cancelUrl;
+        $url = ($this->testmode ? self::SAFERPAY_TEST_URL : self::SAFERPAY_BASE_URL). $endpoint;
 
-        foreach($params as $key => $value) {
-            $paymentInitParams[$key] = $value;
-        }
+        $client = new Client();
+        $response = $client->post(
+            $url,
+            [
+                'json' => $json,
+                'auth' => [$this->username, $this->password],
+            ]
+        );
 
-        return $paymentInitParams;
-    }
-
-    private function apiCall($page, $params)
-    {
-        $curl = curl_init();
-
-        $data = array();
-        foreach ($params as $name => &$value) {
-            $data[] = sprintf('%s=%s', urlencode($name), urlencode($value));
-        }
-
-        if ($this->testmode == true) {
-            $url = self::SAFERPAY_TEST_URL . $page . '?' . implode('&', $data);
-        }
-        else {
-            $url = self::SAFERPAY_BASE_URL . $page . '?' . implode('&', $data);
-        }
-
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_VERBOSE, 1);
-
-        //turning off the server and peer verification(TrustManager Concept).
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
-
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER,1);
-
-        $this->logger->debug('Sending Saferpay API request: ' . $page, $data);
-
-        //getting response from server
-        $response = curl_exec($curl);
-
-        if (!$response) {
-            throw new PaymentException('Saferpay API unreachable');
-        }
-
-        if (strpos($response, 'ERROR:') === 0) {
-            throw new PaymentException($response);
-        }
-
-        return $response;
+        return json_decode($response->getBody()->getContents(), true);
     }
 }
